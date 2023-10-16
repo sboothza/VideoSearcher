@@ -11,18 +11,19 @@ namespace VideoSearcherWin32
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            var configBuilder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
-                                              .AddJsonFile("appsettings.json");
+            var environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true);
 
             Config = configBuilder.Build();
 
-            using var host = Host.CreateDefaultBuilder()                                                            
+            using var host = Host.CreateDefaultBuilder()
                                  .Build();
 
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new FormMain());
         }
         public static IConfiguration Config;
     }
