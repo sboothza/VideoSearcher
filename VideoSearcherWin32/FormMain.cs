@@ -16,10 +16,10 @@ namespace VideoSearcherWin32
         private readonly string _cacheDirectory;
         private readonly string _rootDirectory;
 
-        private string _filename;
+        private Video _video;
 
         // private readonly EsVideoRepository _esRepo;
-        private readonly bool _useMysql;
+        // private readonly bool _useMysql;
         private readonly ElasticClient _client;
 
         public FormMain()
@@ -30,43 +30,18 @@ namespace VideoSearcherWin32
             _cacheDirectory = Path.Combine(pwd, "cache");
             Directory.CreateDirectory(_cacheDirectory);
             _rootDirectory = settings.GetSection("RootFolder").Value;
-            _useMysql = bool.Parse(settings.GetSection("UseMySql").Value);
 
-            if (_useMysql)
-            {
-                _repo = new VideoRepository(settings.GetSection("ConnectionString").Value);
-                comboFields.Items.AddRange(_repo.GetFields().ToArray());
-                comboFields.SelectedIndex = 0;
-                Text = "Video Searcher - using MySql DB";
-            }
-            else
-            {
-                _client = new ElasticClient(settings.GetSection("esHost").Value,
-                    settings.GetSection("esUsername").Value, settings.GetSection("esPassword").Value,
-                    settings.GetSection("esIndex").Value);
-                Console.WriteLine(_client.Test());
-                // var queryString = "{ \"query\": { \"multi_match\": { \"query\": \"braces facial\", \"fields\": [ \"tags\", \"uploader\", \"description\" ], \"operator\": \"and\" } }, \"size\": 20, \"from\": 0, \"sort\": [ { \"duration\": { \"order\": \"desc\" } } ]}";
-                // var result = client.Search<EsVideo>(queryString);
+            _repo = new VideoRepository(settings.GetSection("ConnectionString").Value);
 
-                // _esRepo = new EsVideoRepository(settings.GetSection("esHost").Value, settings.GetSection("esUsername").Value, settings.GetSection("esPassword").Value, settings.GetSection("esIndex").Value);
-                // var response = _esRepo.Get(1960);
-                // Console.WriteLine(response?.Id);
-                // var results = _esRepo.Search("panties", 10);
-                // foreach (var result in results)
-                // {
-                //     Console.WriteLine(result.Id);
-                // }
-                Text = "Video Searcher - using Elasticsearch - some fields are disabled";
-                textBoxSearch2.Enabled = false;
-                textBoxSearch3.Enabled = false;
-                comboFields.Items.AddRange(GetFields().ToArray());
-                comboFields.SelectedIndex = 0;
-                // comboSize.Enabled = false;
-                textBoxUploader.Enabled = false;
-                // comboDurationDirection.Enabled = false;
-                // comboDuration.Enabled = false;
-                menuDelete.Enabled = false;
-            }
+            _client = new ElasticClient(settings.GetSection("esHost").Value,
+                settings.GetSection("esUsername").Value, settings.GetSection("esPassword").Value,
+                settings.GetSection("esIndex").Value);
+            Console.WriteLine(_client.Test());
+
+            Text = "Video Searcher - using Elasticsearch and PostgreSql";
+
+            comboFields.Items.AddRange(GetFields().ToArray());
+            comboFields.SelectedIndex = 0;
         }
 
         private List<string> GetFields()
@@ -92,61 +67,55 @@ namespace VideoSearcherWin32
                 var start = DateTime.Now;
 
                 List<Video> data;
-                if (_useMysql)
+                var ascDesc = comboAsc.Text == "Ascending" ? "asc" : "desc";
+
+                var durationOp = comboDurationDirection.Text switch
                 {
-                    data = _repo.GetSearch(textBoxSearch.Text, textBoxSearch2.Text, textBoxSearch3.Text,
-                        textBoxUploader.Text, comboFields.Text, comboAsc.Text == "Ascending",
-                        int.Parse(textBoxLimit.Text),
-                        int.Parse(comboSize.Text), comboDurationDirection.Text, comboDuration.Text);
-                }
-                else
+                    "N/A" => "lte",
+                    "<=" => "lte",
+                    ">=" => "gte",
+                    _ => "lte"
+                };
+
+                if (comboDurationDirection.Text == "N/A")
+                    comboDuration.Text = "N/A";
+
+                var durationLimit = comboDuration.Text switch
                 {
-                    //data = _esRepo.Search(textBoxSearch.Text.Trim(), int.Parse(textBoxLimit.Text), comboFields.Text.Trim(), comboAsc.Text == "Ascending");
-                    var ascDesc = comboAsc.Text == "Ascending" ? "asc" : "desc";
-                    // var queryString = "{ \"query\": { \"multi_match\": { \"query\": \"" + textBoxSearch.Text.Trim() +
-                    //                   "\", \"fields\": [ \"tags\", \"uploader\", \"description\" ], \"operator\": \"and\" } }, \"size\": " +
-                    //                   textBoxLimit.Text + ", \"from\": 0, \"sort\": [ { \"" + comboFields.Text +
-                    //                   "\": { \"order\": \"" + ascDesc + "\" } } ]}";
+                    "60 min" => (60 * 60).ToString(),
+                    "45 min" => (45 * 60).ToString(),
+                    "30 min" => (30 * 60).ToString(),
+                    "15 min" => (15 * 60).ToString(),
+                    "5 min" => (5 * 60).ToString(),
+                    _ => (60 * 60 * 24).ToString()
+                };
 
-                  
+                var queryText = "";
+                if (!string.IsNullOrWhiteSpace(textBoxSearch.Text))
+                    queryText = "{\"multi_match\":{\"query\":\"%query_terms%\",\"fields\":[\"tags\",\"uploader\",\"description\"],\"operator\":\"and\"}},";
 
-                    var durationOp = comboDurationDirection.Text switch
-                    {
-                        "N/A" => "lte",
-                        "<=" => "lte",
-                        ">=" => "gte",
-                        _ => "lte"
-                    };
+                var queryString =
+                    "{\"query\":{\"bool\":{\"must\":[%query_text%{\"range\":{\"duration\":{\"%duration_op%\":%duration%}}},{\"range\":{\"height\":{\"%height_op%\":%height%}}}%uploader%]}},\"size\":%count%,\"from\":0,\"sort\":[{\"%sort_term%\":{\"order\":\"%sort_order%\"}}]}";
 
-                    if (comboDurationDirection.Text == "N/A")
-                        comboDuration.Text = "N/A";
+                queryString = queryString.Replace("%query_text%", queryText);
+                queryString = queryString.Replace("%query_terms%", textBoxSearch.Text);
+                queryString = queryString.Replace("%duration_op%", durationOp);
+                queryString = queryString.Replace("%duration%", durationLimit);
+                queryString = queryString.Replace("%height_op%", "gte");
+                queryString = queryString.Replace("%height%", comboSize.Text);
+                queryString = queryString.Replace("%count%", textBoxLimit.Text);
+                queryString = queryString.Replace("%sort_term%", comboFields.Text);
+                queryString = queryString.Replace("%sort_order%", ascDesc);
 
-                    var durationLimit = comboDuration.Text switch
-                    {
-                        "60 min" => (60 * 60).ToString(),
-                        "45 min" => (45 * 60).ToString(),
-                        "30 min" => (30 * 60).ToString(),
-                        "15 min" => (15 * 60).ToString(),
-                        "5 min" => (5 * 60).ToString(),
-                        _ => (60 * 60 * 24).ToString()
-                    };
-
-
-                    var queryString =
-                        "{\"query\":{\"bool\":{\"must\":[{\"multi_match\":{\"query\":\"%query_terms%\",\"fields\":[\"tags\",\"uploader\",\"description\"],\"operator\":\"and\"}},{\"range\":{\"duration\":{\"%duration_op%\":%duration%}}},{\"range\":{\"height\":{\"%height_op%\":%height%}}}]}},\"size\":%count%,\"from\":0,\"sort\":[{\"%sort_term%\":{\"order\":\"%sort_order%\"}}]}";
-
-                    queryString = queryString.Replace("%query_terms%", textBoxSearch.Text);
-                    queryString = queryString.Replace("%duration_op%", durationOp);
-                    queryString = queryString.Replace("%duration%", durationLimit);
-                    queryString = queryString.Replace("%height_op%", "gte");
-                    queryString = queryString.Replace("%height%", comboSize.Text);
-                    queryString = queryString.Replace("%count%", textBoxLimit.Text);
-                    queryString = queryString.Replace("%sort_term%", comboFields.Text);
-                    queryString = queryString.Replace("%sort_order%", ascDesc);
-
-                    var tempData = _client.Search<EsVideo>(queryString);
-                    data = tempData.Select(v => new Video(v)).ToList();
+                var uploader = "";
+                if (!string.IsNullOrWhiteSpace(textBoxUploader.Text))
+                {
+                    uploader = ",{\"match\": {\"uploader\": {\"query\": \"%uploader%\"}}}".Replace("%uploader%", textBoxUploader.Text);
                 }
+                queryString = queryString.Replace("%uploader%", uploader);
+
+                var tempData = _client.Search<EsVideo>(queryString);
+                data = tempData.Select(v => new Video(v)).ToList();
 
                 var searchTime = DateTime.Now - start;
                 labelStatus.Text = $"Search: {searchTime:mm\\:ss\\:ff}, Populating thumbnails - 0 of {data.Count}";
@@ -164,8 +133,7 @@ namespace VideoSearcherWin32
                     thumbnail.Height = 160;
 
                     var imageViewer = new PictureBox();
-                    var filename = Path.Combine(Path.Combine(_rootDirectory, $"{item.NormalizedUploader}"),
-                        $"{item.Filename}");
+                    var filename = Path.Combine(Path.Combine(_rootDirectory, $"{item.NormalizedUploader}"), $"{item.Filename}");
                     var thumb = GetThumbnail(filename, 5);
                     if (thumb is not null)
                     {
@@ -186,7 +154,7 @@ namespace VideoSearcherWin32
                     imageViewer.Width = 128;
                     imageViewer.Click += ImageViewer_Click;
                     imageViewer.ContextMenuStrip = imageMenu;
-                    imageViewer.Tag = filename;
+                    imageViewer.Tag = item;
                     var toolTip = new ToolTip();
                     var tt = item.Description == "N/A" ? item.Filename : item.Description;
                     toolTip.SetToolTip(imageViewer, item.Description);
@@ -245,7 +213,8 @@ namespace VideoSearcherWin32
             {
                 try
                 {
-                    var filename = ((PictureBox)sender).Tag.ToString();
+                    var video = ((PictureBox)sender).Tag as Video;
+                    var filename = Path.Combine(Path.Combine(_rootDirectory, $"{video.NormalizedUploader}"), $"{video.Filename}");
                     var process = new Process();
                     process.StartInfo.FileName = filename;
                     process.StartInfo.UseShellExecute = true;
@@ -259,7 +228,7 @@ namespace VideoSearcherWin32
             }
             else if (args.Button == MouseButtons.Right)
             {
-                _filename = ((PictureBox)sender).Tag.ToString();
+                _video = ((PictureBox)sender).Tag as Video;
             }
         }
 
@@ -309,19 +278,23 @@ namespace VideoSearcherWin32
 
         private void test1ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show($"Are you sure you want to delete the file [{_filename}]",
+            var result = MessageBox.Show($"Are you sure you want to delete the file [{_video.Filename}]",
                 "Delete File", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                var file = Path.GetFileName(_filename);
-                _repo.Delete(file, _rootDirectory);
+                Cursor.Current = Cursors.WaitCursor;
+                labelStatus.Text = "Deleting file from disk and db...";
+                _repo.Delete(_video.Filename, _rootDirectory);
+                _client.Delete(_video.Id.ToString());
+                Cursor.Current= Cursors.Default;
+                labelStatus.Text = "Deleting file from disk and db - Done";
             }
         }
 
 
         private void imageMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _filename = (sender as ContextMenuStrip).SourceControl.Tag.ToString();
+            _video = (sender as ContextMenuStrip).SourceControl.Tag as Video;
         }
 
         private void buttonClearCache_Click(object sender, EventArgs e)
@@ -358,7 +331,7 @@ namespace VideoSearcherWin32
             {
                 CheckPathExists = true,
                 OverwritePrompt = true,
-                FileName = Path.GetFileName(_filename)
+                FileName = Path.GetFileName(_video.Filename)
             };
             var result = dlg.ShowDialog();
             if (result.Equals(DialogResult.OK))
@@ -368,7 +341,7 @@ namespace VideoSearcherWin32
                 Application.DoEvents();
                 try
                 {
-                    File.Copy(_filename, dlg.FileName);
+                    File.Copy(_video.Filename, dlg.FileName);
                     labelStatus.Text = "Copy successful";
                 }
                 finally

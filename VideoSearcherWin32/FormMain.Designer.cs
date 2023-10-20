@@ -38,12 +38,8 @@
             buttonClearCache = new Button();
             textBoxUploader = new TextBox();
             label7 = new Label();
-            label6 = new Label();
-            textBoxSearch3 = new TextBox();
             comboSize = new ComboBox();
             label5 = new Label();
-            label4 = new Label();
-            textBoxSearch2 = new TextBox();
             textBoxLimit = new TextBox();
             label3 = new Label();
             comboAsc = new ComboBox();
@@ -73,12 +69,8 @@
             panelHeader.Controls.Add(buttonClearCache);
             panelHeader.Controls.Add(textBoxUploader);
             panelHeader.Controls.Add(label7);
-            panelHeader.Controls.Add(label6);
-            panelHeader.Controls.Add(textBoxSearch3);
             panelHeader.Controls.Add(comboSize);
             panelHeader.Controls.Add(label5);
-            panelHeader.Controls.Add(label4);
-            panelHeader.Controls.Add(textBoxSearch2);
             panelHeader.Controls.Add(textBoxLimit);
             panelHeader.Controls.Add(label3);
             panelHeader.Controls.Add(comboAsc);
@@ -90,14 +82,14 @@
             panelHeader.Dock = DockStyle.Top;
             panelHeader.Location = new Point(0, 0);
             panelHeader.Name = "panelHeader";
-            panelHeader.Size = new Size(912, 110);
+            panelHeader.Size = new Size(805, 110);
             panelHeader.TabIndex = 0;
             // 
             // comboDuration
             // 
             comboDuration.FormattingEnabled = true;
             comboDuration.Items.AddRange(new object[] { "N/A", "60 min", "45 min", "30 min", "15 min", "5 min" });
-            comboDuration.Location = new Point(712, 42);
+            comboDuration.Location = new Point(483, 42);
             comboDuration.Name = "comboDuration";
             comboDuration.Size = new Size(79, 23);
             comboDuration.TabIndex = 19;
@@ -117,7 +109,7 @@
             // 
             comboDurationDirection.FormattingEnabled = true;
             comboDurationDirection.Items.AddRange(new object[] { "<=", ">=", "N/A" });
-            comboDurationDirection.Location = new Point(655, 42);
+            comboDurationDirection.Location = new Point(423, 42);
             comboDurationDirection.Name = "comboDurationDirection";
             comboDurationDirection.Size = new Size(52, 23);
             comboDurationDirection.TabIndex = 17;
@@ -127,7 +119,7 @@
             // 
             label8.AutoSize = true;
             label8.ForeColor = SystemColors.ControlLight;
-            label8.Location = new Point(587, 44);
+            label8.Location = new Point(359, 45);
             label8.Name = "label8";
             label8.Size = new Size(53, 15);
             label8.TabIndex = 16;
@@ -136,9 +128,9 @@
             // 
             // buttonClearCache
             // 
-            buttonClearCache.Location = new Point(655, 69);
+            buttonClearCache.Location = new Point(423, 73);
             buttonClearCache.Name = "buttonClearCache";
-            buttonClearCache.Size = new Size(96, 23);
+            buttonClearCache.Size = new Size(139, 23);
             buttonClearCache.TabIndex = 15;
             buttonClearCache.Text = "Clear Cache";
             buttonClearCache.UseVisualStyleBackColor = true;
@@ -146,7 +138,7 @@
             // 
             // textBoxUploader
             // 
-            textBoxUploader.Location = new Point(423, 70);
+            textBoxUploader.Location = new Point(119, 73);
             textBoxUploader.Name = "textBoxUploader";
             textBoxUploader.Size = new Size(139, 23);
             textBoxUploader.TabIndex = 14;
@@ -155,34 +147,17 @@
             // 
             label7.AutoSize = true;
             label7.ForeColor = SystemColors.ControlLight;
-            label7.Location = new Point(333, 76);
+            label7.Location = new Point(30, 73);
             label7.Name = "label7";
             label7.Size = new Size(55, 15);
             label7.TabIndex = 13;
             label7.Text = "Uploader";
             // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.ForeColor = SystemColors.ControlLight;
-            label6.Location = new Point(30, 73);
-            label6.Name = "label6";
-            label6.Size = new Size(20, 15);
-            label6.TabIndex = 12;
-            label6.Text = "Or";
-            // 
-            // textBoxSearch3
-            // 
-            textBoxSearch3.Location = new Point(119, 70);
-            textBoxSearch3.Name = "textBoxSearch3";
-            textBoxSearch3.Size = new Size(199, 23);
-            textBoxSearch3.TabIndex = 11;
-            // 
             // comboSize
             // 
             comboSize.FormattingEnabled = true;
             comboSize.Items.AddRange(new object[] { "240", "480", "720", "1080" });
-            comboSize.Location = new Point(423, 42);
+            comboSize.Location = new Point(119, 42);
             comboSize.Name = "comboSize";
             comboSize.Size = new Size(139, 23);
             comboSize.TabIndex = 10;
@@ -192,32 +167,15 @@
             // 
             label5.AutoSize = true;
             label5.ForeColor = SystemColors.ControlLight;
-            label5.Location = new Point(333, 48);
+            label5.Location = new Point(30, 45);
             label5.Name = "label5";
             label5.Size = new Size(83, 15);
             label5.TabIndex = 9;
             label5.Text = "Minimum Size";
             // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.ForeColor = SystemColors.ControlLight;
-            label4.Location = new Point(30, 44);
-            label4.Name = "label4";
-            label4.Size = new Size(20, 15);
-            label4.TabIndex = 8;
-            label4.Text = "Or";
-            // 
-            // textBoxSearch2
-            // 
-            textBoxSearch2.Location = new Point(119, 41);
-            textBoxSearch2.Name = "textBoxSearch2";
-            textBoxSearch2.Size = new Size(199, 23);
-            textBoxSearch2.TabIndex = 7;
-            // 
             // textBoxLimit
             // 
-            textBoxLimit.Location = new Point(836, 11);
+            textBoxLimit.Location = new Point(655, 45);
             textBoxLimit.Name = "textBoxLimit";
             textBoxLimit.Size = new Size(60, 23);
             textBoxLimit.TabIndex = 6;
@@ -227,7 +185,7 @@
             // 
             label3.AutoSize = true;
             label3.ForeColor = SystemColors.ControlLight;
-            label3.Location = new Point(796, 14);
+            label3.Location = new Point(587, 45);
             label3.Name = "label3";
             label3.Size = new Size(34, 15);
             label3.TabIndex = 5;
@@ -265,7 +223,7 @@
             // 
             textBoxSearch.Location = new Point(119, 12);
             textBoxSearch.Name = "textBoxSearch";
-            textBoxSearch.Size = new Size(199, 23);
+            textBoxSearch.Size = new Size(234, 23);
             textBoxSearch.TabIndex = 0;
             // 
             // label1
@@ -280,9 +238,9 @@
             // 
             // buttonSearch
             // 
-            buttonSearch.Location = new Point(821, 69);
+            buttonSearch.Location = new Point(655, 74);
             buttonSearch.Name = "buttonSearch";
-            buttonSearch.Size = new Size(75, 23);
+            buttonSearch.Size = new Size(136, 23);
             buttonSearch.TabIndex = 1;
             buttonSearch.Text = "Search";
             buttonSearch.UseVisualStyleBackColor = true;
@@ -295,7 +253,7 @@
             flowLayoutPanel.Dock = DockStyle.Fill;
             flowLayoutPanel.Location = new Point(0, 110);
             flowLayoutPanel.Name = "flowLayoutPanel";
-            flowLayoutPanel.Size = new Size(912, 340);
+            flowLayoutPanel.Size = new Size(805, 162);
             flowLayoutPanel.TabIndex = 1;
             // 
             // imageMenu
@@ -324,10 +282,10 @@
             // 
             statusStrip.ImageScalingSize = new Size(20, 20);
             statusStrip.Items.AddRange(new ToolStripItem[] { labelStatus });
-            statusStrip.Location = new Point(0, 428);
+            statusStrip.Location = new Point(0, 250);
             statusStrip.Name = "statusStrip";
             statusStrip.Padding = new Padding(1, 0, 12, 0);
-            statusStrip.Size = new Size(912, 22);
+            statusStrip.Size = new Size(805, 22);
             statusStrip.TabIndex = 2;
             statusStrip.Text = "statusStrip1";
             // 
@@ -342,11 +300,12 @@
             AcceptButton = buttonSearch;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(912, 450);
+            ClientSize = new Size(805, 272);
             Controls.Add(statusStrip);
             Controls.Add(flowLayoutPanel);
             Controls.Add(panelHeader);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimumSize = new Size(821, 311);
             Name = "FormMain";
             Text = "Video Searcher";
             panelHeader.ResumeLayout(false);
@@ -370,12 +329,8 @@
         private ComboBox comboAsc;
         private TextBox textBoxLimit;
         private Label label3;
-        private Label label4;
-        private TextBox textBoxSearch2;
         private ComboBox comboSize;
         private Label label5;
-        private Label label6;
-        private TextBox textBoxSearch3;
         private ContextMenuStrip imageMenu;
         private ToolStripMenuItem menuDelete;
         private TextBox textBoxUploader;

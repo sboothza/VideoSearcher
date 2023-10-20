@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Data.Common;
-using System.Reflection.PortableExecutable;
+﻿using System.Data.Common;
 using DatabaseProcessor;
 using VideoCommon;
 
@@ -65,12 +63,5 @@ namespace VideoSearcher
             Description = video.description;
             Tags = video.tags;
         }
-	}
-
-	public class VideoList : List<Video>
-	{
-		public VideoList()
-		{
-		}
 	}
 }

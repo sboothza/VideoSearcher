@@ -1,6 +1,5 @@
 ﻿using System.Data.Common;
 using System.Data;
-using Microsoft.Extensions.Configuration;
 
 namespace VideoSearcher
 {
@@ -17,7 +16,7 @@ namespace VideoSearcher
         {
             try
             {
-                var conn = new MySql.Data.MySqlClient.MySqlConnection();
+                var conn = new Npgsql.NpgsqlConnection();
                 conn.ConnectionString = _connectionString;
                 conn.Open();
 
@@ -39,7 +38,7 @@ namespace VideoSearcher
 
                 return data;
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 throw;
@@ -123,7 +122,7 @@ namespace VideoSearcher
         {
             try
             {
-                var conn = new MySql.Data.MySqlClient.MySqlConnection();
+                var conn = new Npgsql.NpgsqlConnection();
                 conn.ConnectionString = _connectionString;
                 conn.Open();
 
@@ -147,7 +146,7 @@ namespace VideoSearcher
 
                 return data;
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 throw;
@@ -159,7 +158,7 @@ namespace VideoSearcher
         {
             try
             {
-                var conn = new MySql.Data.MySqlClient.MySqlConnection();
+                var conn = new Npgsql.NpgsqlConnection();
                 conn.ConnectionString = _connectionString;
                 conn.Open();
 
@@ -172,7 +171,7 @@ namespace VideoSearcher
                     command.ExecuteNonQuery();
                 }
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 throw;

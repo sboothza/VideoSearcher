@@ -1,4 +1,3 @@
-import mysql.connector
 import psycopg2
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers

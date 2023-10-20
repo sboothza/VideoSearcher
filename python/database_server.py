@@ -239,4 +239,4 @@ if __name__ == "__main__":
     pubsub.bind(VideoError, handle_video_error)
     pubsub.bind_everything(handle_everything)
     pubsub.start()
-    app.run()
+    app.run(host="0.0.0.0")

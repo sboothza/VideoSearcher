@@ -1,27 +1,15 @@
-﻿using MySqlX.XDevAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace VideoCommon
 {
     public class ElasticClient
     {
-        private readonly string _host;
-        private readonly string _username;
-        private readonly string _password;
         private readonly string _index;
         private readonly HttpClient _client;
 
         public ElasticClient(string host, string username, string password, string index)
         {
-            _host=host;
-            _username=username;
-            _password=password;
             _index=index;
 
             var handler = new HttpClientHandler();
@@ -29,10 +17,10 @@ namespace VideoCommon
             handler.ServerCertificateCustomValidationCallback =
                 (httpRequestMessage, cert, cetChain, policyErrors) => true;
             _client = new HttpClient(handler);
-            _client.BaseAddress = new Uri(_host);
+            _client.BaseAddress = new Uri(host);
             _client.DefaultRequestHeaders.Clear();
             _client.DefaultRequestHeaders.ConnectionClose = true;
-            var authenticationString = $"{_username}:{_password}";
+            var authenticationString = $"{username}:{password}";
             var base64EncodedAuthenticationString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authenticationString));
             _client.DefaultRequestHeaders.Add("Authorization", "Basic " + base64EncodedAuthenticationString);
         }
@@ -41,6 +29,23 @@ namespace VideoCommon
         {
             var response = _client.GetAsync(_index).Result;
             return response.IsSuccessStatusCode;
+        }
+
+        public bool Delete(string id)
+        {
+            // /<index>/_doc/<_id>
+            try
+            {
+                var response = _client.DeleteAsync($"{_index}/_doc/{id}").Result;
+
+                if (response.IsSuccessStatusCode)
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return false;
         }
 
         public List<T> Search<T>(string query) where T:IdObject

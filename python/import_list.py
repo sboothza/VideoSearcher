@@ -30,7 +30,8 @@ def import_list(filename: str, pub: Pub, api_url: str) -> None:
         if clean_url.startswith("#") or clean_url == "":
             pass
         else:
-            if not url_exists(clean_url, api_url):
+            # if not url_exists(clean_url, api_url):
+            if True:
                 msg = QueueVideo(clean_url)
                 pub.publish(msg)
                 print(f"added url {clean_url}")
